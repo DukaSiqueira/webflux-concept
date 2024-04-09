@@ -1,5 +1,7 @@
 package br.com.duka.siqueira.webfluxconcept.controller;
 
+import br.com.duka.siqueira.webfluxconcept.model.request.UserRequest;
+import br.com.duka.siqueira.webfluxconcept.model.response.UserResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
