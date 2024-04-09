@@ -1,0 +1,4 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb+srv://esiqueira:Siqueira_123@webfluxconceptcluster.9rpxke6.mongodb.net/webflux-concept?retryWrites=true&w=majority&appName=WebfluxConceptCluster
