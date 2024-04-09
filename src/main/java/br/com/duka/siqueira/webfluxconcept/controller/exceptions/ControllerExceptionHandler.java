@@ -25,7 +25,7 @@ public class ControllerExceptionHandler {
                                 .timestamp(now())
                                 .status(BAD_REQUEST.value())
                                 .error(BAD_REQUEST.getReasonPhrase())
-                                .message(veifyDupKey(ex.getMessage()))
+                                .message(verifyDupKey(ex.getMessage()))
                                 .path(request.getURI().getPath())
                                 .build()
                         )
@@ -52,7 +52,7 @@ public class ControllerExceptionHandler {
         return ResponseEntity.status(BAD_REQUEST).body(Mono.just(error));
     }
 
-    private String veifyDupKey(String message) {
+    private String verifyDupKey(String message) {
         if (message.contains("email dup key")) {
             return "E-mail already registered";
         }
