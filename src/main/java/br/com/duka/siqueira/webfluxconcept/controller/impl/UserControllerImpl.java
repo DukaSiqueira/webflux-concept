@@ -1,6 +1,7 @@
 package br.com.duka.siqueira.webfluxconcept.controller.impl;
 
 import br.com.duka.siqueira.webfluxconcept.controller.UserController;
+import br.com.duka.siqueira.webfluxconcept.mapper.UserMapper;
 import br.com.duka.siqueira.webfluxconcept.model.request.UserRequest;
 import br.com.duka.siqueira.webfluxconcept.model.response.UserResponse;
 import br.com.duka.siqueira.webfluxconcept.service.UserService;
@@ -18,6 +19,7 @@ import reactor.core.publisher.Mono;
 public class UserControllerImpl implements UserController {
 
     private final UserService service;
+    private final UserMapper mapper;
 
     @Override
     public ResponseEntity<Mono<Void>> save(final UserRequest request) {
@@ -26,8 +28,10 @@ public class UserControllerImpl implements UserController {
     }
 
     @Override
-    public ResponseEntity<Mono<UserResponse>> find(String id) {
-        return null;
+    public ResponseEntity<Mono<UserResponse>> findById(String id) {
+        return ResponseEntity.ok().body(
+                service.findById(id).map(mapper::toResponse)
+        );
     }
 
     @Override
