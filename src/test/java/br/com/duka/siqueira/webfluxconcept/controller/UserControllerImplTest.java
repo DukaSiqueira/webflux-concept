@@ -17,6 +17,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.web.reactive.function.BodyInserters.fromValue;
 import static reactor.core.publisher.Mono.just;
 
@@ -34,7 +35,7 @@ class UserControllerImplTest {
     @Test
     @DisplayName("Test endpoint save with success")
     void testSaveWithSuccess() {
-        final var request = new UserRequest("Usuário Teste",
+        final var request = new UserRequest(" Usuário Teste",
                 "emailteste@mail.com",
                 "abcd1234");
 
@@ -48,6 +49,28 @@ class UserControllerImplTest {
                 .isCreated();
 
         verify(service).save(any(UserRequest.class));
+    }
+
+    @Test
+    @DisplayName("Test endpoint save with bad requets")
+    void testSaveWithBadRequest() {
+        final var request = new UserRequest(" Usuário Teste",
+                "emailteste@mail.com",
+                "abcd1234");
+
+        webTestClient.post().uri("/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(fromValue(request))
+                .exchange()
+                .expectStatus()
+                .isBadRequest()
+                .expectBody()
+                .jsonPath("$.path").isEqualTo("/users")
+                .jsonPath("$.status").isEqualTo(BAD_REQUEST.value())
+                .jsonPath("$.error").isEqualTo("Validation error")
+                .jsonPath("$.message").isEqualTo("Error on validation attributes")
+                .jsonPath("$.errors[0].fieldName").isEqualTo("name")
+                .jsonPath("$.errors[0].message").isEqualTo("field cannot have blank spaces at the beginning or at end");
     }
 
     @Test
