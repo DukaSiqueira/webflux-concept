@@ -73,7 +73,7 @@ class UserControllerImplTest {
     @Test
     @DisplayName("Test endpoint save with bad requets")
     void testSaveWithBadRequest() {
-        final var request = new UserRequest(" "+NAME,EMAIL,PASSWORD);;
+        final var request = new UserRequest(" "+NAME,EMAIL,PASSWORD);
 
         webTestClient.post().uri(URI)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -107,6 +107,9 @@ class UserControllerImplTest {
                 .jsonPath("$.name").isEqualTo(NAME)
                 .jsonPath("$.email").isEqualTo(EMAIL)
                 .jsonPath("$.password").isEqualTo(PASSWORD);
+
+        verify(service).findById(anyString());
+        verify(mapper).toResponse(any(User.class));
     }
 
     @Test
@@ -122,6 +125,8 @@ class UserControllerImplTest {
                 .expectBody()
                 .jsonPath("$.message").isEqualTo(
                         "Object not found. Id: "+ ID_NOT_EXISTS +" Type: User");
+
+        verify(service).findById(anyString());
     }
 
     @Test
@@ -141,10 +146,35 @@ class UserControllerImplTest {
                 .jsonPath("$.[0].name").isEqualTo(NAME)
                 .jsonPath("$.[0].email").isEqualTo(EMAIL)
                 .jsonPath("$.[0].password").isEqualTo(PASSWORD);
+
+        verify(service).findAll();
+        verify(mapper).toResponse(any(User.class));
     }
 
     @Test
-    void update() {
+    @DisplayName("Test update with success")
+    void updateWithSuccess() {
+        final var userResponse = new UserResponse(ID, NAME,EMAIL,PASSWORD);
+        final var request = new UserRequest(NAME,EMAIL,PASSWORD);
+
+        when(service.update(anyString(), any(UserRequest.class)))
+                .thenReturn(just(User.builder().build()));
+        when(mapper.toResponse(any(User.class))).thenReturn(userResponse);
+
+        webTestClient.patch().uri(URI+"/"+ID)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(fromValue(request))
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(ID)
+                .jsonPath("$.name").isEqualTo(NAME)
+                .jsonPath("$.email").isEqualTo(EMAIL)
+                .jsonPath("$.password").isEqualTo(PASSWORD);
+
+        verify(service).update(anyString(), any(UserRequest.class));
+        verify(mapper).toResponse(any(User.class));
     }
 
     @Test
