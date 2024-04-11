@@ -25,7 +25,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.web.reactive.function.BodyInserters.fromValue;
-import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.just;
 
 @ExtendWith(SpringExtension.class)
@@ -115,8 +114,8 @@ class UserControllerImplTest {
     @Test
     @DisplayName("Test find by id with not found exception")
     void testFindByIdWithNotFoundException() {
-        when(service.findById(anyString())).thenReturn(error(new ObjectNotFoundException(
-                "Object not found. Id: "+ ID_NOT_EXISTS +" Type: User")));
+        when(service.findById(anyString())).thenThrow(new ObjectNotFoundException(
+                "Object not found. Id: "+ ID_NOT_EXISTS +" Type: User"));
 
         webTestClient.get().uri(URI+"/"+ID_NOT_EXISTS)
                 .accept(MediaType.APPLICATION_JSON)
@@ -178,6 +177,15 @@ class UserControllerImplTest {
     }
 
     @Test
+    @DisplayName("Test delete with success")
     void delete() {
+        when(service.delete(anyString())).thenReturn(just(User.builder().build()));
+
+        webTestClient.delete().uri(URI+"/"+ID)
+                .exchange()
+                .expectStatus()
+                .isOk();
+
+        verify(service).delete(anyString());
     }
 }
