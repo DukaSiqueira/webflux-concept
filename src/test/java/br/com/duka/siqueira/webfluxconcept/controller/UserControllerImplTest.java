@@ -15,10 +15,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.web.reactive.function.BodyInserters;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.web.reactive.function.BodyInserters.fromValue;
 import static reactor.core.publisher.Mono.just;
 
 @ExtendWith(SpringExtension.class)
@@ -41,15 +42,20 @@ class UserControllerImplTest {
     @Test
     @DisplayName("Test endpoint save with success")
     void testSaveWithSuccess() {
-        UserRequest request = new UserRequest("Eduardo", "e@gmail.com", "12345678");
+        final var request = new UserRequest("Usuário Teste",
+                "emailteste@mail.com",
+                "abcd1234");
 
         when(service.save(any(UserRequest.class))).thenReturn(just(User.builder().build()));
 
         webTestClient.post().uri("/users")
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromValue(request))
+                .body(fromValue(request))
                 .exchange()
-                .expectStatus().isCreated();
+                .expectStatus()
+                .isCreated();
+
+        verify(service).save(any(UserRequest.class));
     }
 
     @Test
