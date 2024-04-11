@@ -5,6 +5,7 @@ import br.com.duka.siqueira.webfluxconcept.mapper.UserMapper;
 import br.com.duka.siqueira.webfluxconcept.model.request.UserRequest;
 import br.com.duka.siqueira.webfluxconcept.model.response.UserResponse;
 import br.com.duka.siqueira.webfluxconcept.service.UserService;
+import br.com.duka.siqueira.webfluxconcept.service.exception.ObjectNotFoundException;
 import com.mongodb.reactivestreams.client.MongoClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,6 +24,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.web.reactive.function.BodyInserters.fromValue;
+import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.just;
 
 @ExtendWith(SpringExtension.class)
@@ -31,6 +33,7 @@ import static reactor.core.publisher.Mono.just;
 class UserControllerImplTest {
 
     private static final String ID = "ab12cd34";
+    private static final String ID_NOT_EXISTS = "ab12cd34e";
     private static final String NAME = "Usuário Teste";
     private static final String EMAIL = "emailteste@mail.com";
     private static final String PASSWORD = "abcd1234";
@@ -103,6 +106,21 @@ class UserControllerImplTest {
                 .jsonPath("$.name").isEqualTo(NAME)
                 .jsonPath("$.email").isEqualTo(EMAIL)
                 .jsonPath("$.password").isEqualTo(PASSWORD);
+    }
+
+    @Test
+    @DisplayName("Test find by id with success")
+    void testFindByIdWithNotFoundException() {
+        when(service.findById(anyString())).thenReturn(error(new ObjectNotFoundException(
+                "Object not found. Id: "+ ID_NOT_EXISTS +" Type: User")));
+
+        webTestClient.get().uri(URI+"/"+ID_NOT_EXISTS)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody()
+                .jsonPath("$.message").isEqualTo(
+                        "Object not found. Id: "+ ID_NOT_EXISTS +" Type: User");
     }
 
     @Test
