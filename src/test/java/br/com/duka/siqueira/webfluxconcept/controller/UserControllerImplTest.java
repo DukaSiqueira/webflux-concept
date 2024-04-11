@@ -1,10 +1,8 @@
 package br.com.duka.siqueira.webfluxconcept.controller;
 
 import br.com.duka.siqueira.webfluxconcept.entity.User;
-import br.com.duka.siqueira.webfluxconcept.mapper.UserMapper;
 import br.com.duka.siqueira.webfluxconcept.model.request.UserRequest;
 import br.com.duka.siqueira.webfluxconcept.service.UserService;
-import com.mongodb.reactivestreams.client.MongoClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,12 +30,6 @@ class UserControllerImplTest {
 
     @MockBean
     private UserService service;
-
-    @MockBean
-    private UserMapper mapper;
-
-    @MockBean
-    private MongoClient mongoClient;
 
     @Test
     @DisplayName("Test endpoint save with success")
